@@ -9,10 +9,10 @@ public class Booking
     public Passenger Passenger { get; init; }
     public Flight Flight { get; init; }
     public DateTime BookingDate { get; init; }
-    public string Class { get; set; }
+    public ClassType Class { get; set; }
     public double Price { get; init; }
 
-    private static int _bookingNumber = 0;
+    private static int _bookingNumber ;
 
     public Booking()
     {

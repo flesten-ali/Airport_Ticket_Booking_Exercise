@@ -1,4 +1,5 @@
 ﻿using FTS.ATBS.BookingManagement;
+using FTS.ATBS.Extenstions;
 using System.Globalization;
 using System.Reflection;
 namespace FTS.ATBS.Repository;
@@ -11,6 +12,7 @@ public static class Validation
         Errors.Add(errorMsg);
         return false;
     }
+
     public static DateTime ValidateDate(string target)
     {
         var result = DateTime.
@@ -31,24 +33,17 @@ public static class Validation
         }
         return departureDate;
     }
-    public static string ValidateClass(string target)
+
+    public static ClassType ValidateClass(string flightClass)
     {
-        var flightClass = target;
-        var flag = false;
-        foreach (var className in Flight.FlightClasses.Keys)
-        {
-            if (!string.Equals(flightClass, className, StringComparison.CurrentCultureIgnoreCase))
-                continue;
-            flightClass = className;
-            flag = true;
-            break;
-        }
-        if (!flag)
+        if (!Flight.FlightClasses.Keys.Any(key => key.ToString().IsEqualIgnoreCase(flightClass)))
         {
             Errors.Add("Class Type, must be [Economy or Business or FirstClass]");
         }
-        return flightClass ?? "";
+        Enum.TryParse<ClassType>(flightClass , out var classType);
+        return classType ;
     }
+
     public static void DynamicValidation()
     {
         var flightType = typeof(Flight);

@@ -1,61 +1,58 @@
-﻿using FTS.ATBS.BookingManagement;
+﻿using CsvHelper;
+using FTS.ATBS.BookingManagement;
 using FTS.ATBS.Print;
+using System.Globalization;
+using System.Reflection.PortableExecutable;
 namespace FTS.ATBS.Repository;
 public static class FlightRepository
 {   
-    public static List<Flight> Flights  { get; } = new ();
+    public static List<Flight> Flights  { get; private set; } = new ();
     public static List<Flight>? UploadFlights(string path)
     {
         if (!File.Exists(path))
         {
             Console.WriteLine("Path does not Exist!");
-            return null; 
+            return null;
         }
-        var lines  = File.ReadAllLines (path);
-        foreach (var line in lines)
+
+        using (var reader = new StreamReader(path))
+        using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
         {
-            var flightLine = line.Split(",");
-            if (flightLine.Length <= 0) continue;
-
-            var departureCountry = flightLine[0];
-            Validation.ValidateString(departureCountry, "* Departure Country can not be empty ");
- 
-            var destinationCountry= flightLine[1];
-            Validation.ValidateString(destinationCountry, "* Destination Country can not be empry");
-
-            var departureDate= Validation.ValidateDate(flightLine[2]);
-
-            var departureAirport = flightLine[3];
-            Validation.ValidateString(departureAirport, "* Departure Airport can not be empty"); 
-               
-            var arrivalAirport = flightLine[4];
-            Validation.ValidateString(arrivalAirport, "* Arrival Airport can not be empty");
-                     
-            var flightClass = Validation.ValidateClass(flightLine[5]);
-               
-            if(Validation.Errors.Count > 0)
+            csv.Context.RegisterClassMap<FlightMap>();
+            while (csv.Read())
             {
-                PrintConfig.PrintList(Validation.Errors);
-                Console.WriteLine("Please Correct Data and Try again!");
-                return null;
-            }
-            else
-            {
-                var flight = new Flight()
-                {
-                    DepartureCountry = departureCountry,
-                    DestinationCountry = destinationCountry,
-                    ArrivalAirport = arrivalAirport,
-                    DepartureAirport = departureAirport,
-                    DepartureDate = departureDate,
-                    FlightClass = flightClass,
-                };
-                Flights.Add(flight);  
+                var flight = csv.GetRecord<Flight>();
+                bool isValidFlight = ValidateFlight(flight);
+                if (isValidFlight) Flights.Add(flight);
             }
         }
+
+        if (Validation.Errors.Count > 0)
+        {
+            PrintConfig.PrintList(Validation.Errors);
+            Console.WriteLine("Please Correct the Wrong Data and Try again!");
+            return null;
+        }
+
         Validation.Errors.Clear();
-        Console.WriteLine(Environment.NewLine+"Flights Uploaded Successfully!"+Environment.NewLine);
+
+        Console.WriteLine(Environment.NewLine + "Flights Uploaded Successfully!" + Environment.NewLine);
         return Flights;
+    }
+
+    private static bool ValidateFlight(Flight flight)
+    {
+        Validation.ValidateString(flight.DepartureCountry, "* Departure Country cannot be empty");
+        Validation.ValidateString(flight.DestinationCountry, "* Destination Country cannot be empty");
+        Validation.ValidateString(flight.DepartureAirport, "* Departure Airport cannot be empty");
+        Validation.ValidateString(flight.ArrivalAirport, "* Arrival Airport cannot be empty");
+        Validation.ValidateClass(flight.FlightClass.ToString());
+        if (Validation.Errors.Count > 0)
+        {
+            return false;
+        }
+        return true;
+
     }
 }
 

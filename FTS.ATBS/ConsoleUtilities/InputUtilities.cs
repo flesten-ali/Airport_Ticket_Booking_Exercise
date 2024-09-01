@@ -1,4 +1,5 @@
-﻿using FTS.ATBS.Repository;
+﻿using FTS.ATBS.BookingManagement;
+using FTS.ATBS.Repository;
 namespace FTS.ATBS.ConsoleUtilities;
 public static partial class Utilities
 {
@@ -9,6 +10,7 @@ public static partial class Utilities
         int.TryParse(passenger, out var res);
         return res;
     }
+
     private static double GetPrice()
     {
         Console.WriteLine("Enter Price:");
@@ -16,7 +18,8 @@ public static partial class Utilities
         double.TryParse(price, out var priceRes);
         return priceRes;
     }
-    private static string GetClass()
+
+    private static ClassType GetClass()
     {
         Console.WriteLine("Enter Class:");
         var className = Console.ReadLine() ?? "";
@@ -24,6 +27,7 @@ public static partial class Utilities
         Validation.ValidateString(className, "Class Type can not be empty");
         return flightClass;
     }
+
     private static string GetArrivalAirport()
     {
         Console.WriteLine("Enter Arrival Airport:");
@@ -31,6 +35,7 @@ public static partial class Utilities
         Validation.ValidateString(arrivalAirport, "Arrival Airport can not be empty");
         return arrivalAirport;
     }
+
     private static string GetDepartureAirport()
     {
         Console.WriteLine("Enter Departure Airport:");
@@ -38,6 +43,7 @@ public static partial class Utilities
         Validation.ValidateString(departureAirport, "Departure Airport can not be empty");
         return departureAirport;
     }
+
     private static DateTime GetDepartureDate()
     {
         Console.WriteLine("Enter Departure Date:");
@@ -46,6 +52,7 @@ public static partial class Utilities
         var departureDate = Validation.ValidateDate(date);
         return departureDate;
     }
+
     private static string GetDestinationCountry()
     {  
         Console.WriteLine("Enter Destination Country:");
@@ -53,6 +60,7 @@ public static partial class Utilities
         Validation.ValidateString(destinationCountry, "Destination Country can not be empry");
         return destinationCountry;
     }
+
     private static string GetDepartureCountry()
     {
         Console.WriteLine("Enter Departure Country:");

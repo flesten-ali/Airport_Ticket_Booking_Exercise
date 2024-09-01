@@ -25,6 +25,7 @@ public static partial class Utilities
             break;
         }
     }
+
     private static string ChooseRole()
     {
         Console.WriteLine("""  
@@ -46,6 +47,7 @@ public static partial class Utilities
         }
         return role;
     }
+
     private static string GetManagerChoice()
     {
         Console.WriteLine("""
@@ -66,6 +68,7 @@ public static partial class Utilities
         }
         return choice;
     }
+
     private static string GetPassengerChoice()
     {
         Console.WriteLine("""
@@ -88,6 +91,7 @@ public static partial class Utilities
         }
         return choice;
     }
+
     private static void StartManagerMenu(Manager manager)
     {
         while (true)
@@ -110,6 +114,7 @@ public static partial class Utilities
             break;
         }
     }
+
     private static void StartPassengerMenu(Passenger passenger)
     {
         while (true)
@@ -141,4 +146,5 @@ public static partial class Utilities
             break;
         }
     }
+
 }

@@ -3,7 +3,6 @@ namespace FTS.ATBS.BookingManagement;
  
 public static class BookingService
 {
-   
     private static readonly List<Booking> AllBookings =new ();
     public static void BookFlight(Passenger passenger, Flight flight)
     {
@@ -21,6 +20,7 @@ public static class BookingService
         passenger.Bookings.Add(booking);
         flight.Bookings.Add(booking);
     }
+
     public static List<Booking> GetAllBookings()
     {
         return AllBookings;  

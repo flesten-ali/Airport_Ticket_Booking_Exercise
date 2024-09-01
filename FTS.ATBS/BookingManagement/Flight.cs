@@ -21,20 +21,26 @@ public class Flight
     public string ArrivalAirport { get; init; }
  
     [ValidationRule("Flight Class", "Free Text", "Required, must be [Economy or Business or FirstClass]")]
-    public string FlightClass { get; init; }
+    public ClassType FlightClass { get; init; }
     public List<Booking> Bookings { get; } = new();
 
-    public static Dictionary<string , double> FlightClasses = new()
+    public static Dictionary<ClassType, double> FlightClasses = new()
     {   
-        { "Economy", 100 },
-        { "Business", 200.34 },
-        { "FirstClass", 300.89 }
+        { ClassType.Economy, 100 },
+        { ClassType.Business, 200.34 },
+        { ClassType.FirstClass, 300.89 }
     };
     private static int _flightId = 1;
     public Flight()
     {
         FlightId = _flightId++;
     }
+
+    public void UpdatePrice(ClassType type , double price)
+    {
+        FlightClasses[type] = price;
+    }
+
     public override string ToString()
     {
         return $"""

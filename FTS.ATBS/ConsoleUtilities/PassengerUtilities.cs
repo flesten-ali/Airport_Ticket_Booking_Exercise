@@ -1,4 +1,5 @@
 ﻿using FTS.ATBS.BookingManagement;
+using FTS.ATBS.Extenstions;
 using FTS.ATBS.Print;
 using FTS.ATBS.Repository;
 using FTS.ATBS.Users;
@@ -28,13 +29,12 @@ public static partial class Utilities
         }
         else
         {
-            var allFlights = flights.Where(f =>string.Equals( f.DepartureCountry,departureCountry,StringComparison.CurrentCultureIgnoreCase) &&
-                string.Equals( f.DestinationCountry , destinationCountry , StringComparison.CurrentCultureIgnoreCase)&&
-                string.Equals ( f.DepartureAirport , departureAirport , StringComparison.CurrentCultureIgnoreCase) &&
-                string.Equals(  f.ArrivalAirport , arrivalAirport, StringComparison.CurrentCultureIgnoreCase) &&
-                string.Equals(  f.FlightClass , flightClass, StringComparison.CurrentCultureIgnoreCase)
-                && f.DepartureDate == departureDate
-            ).ToList();
+            var allFlights = flights.Where(f => f.DepartureCountry.IsEqualIgnoreCase(departureCountry) &&
+                           f.DestinationCountry.IsEqualIgnoreCase(destinationCountry)&&
+                           f.DepartureAirport.IsEqualIgnoreCase(departureAirport)&&
+                           f.ArrivalAirport.IsEqualIgnoreCase(arrivalAirport)&&
+                           f.FlightClass.ToString().IsEqualIgnoreCase(flightClass.ToString())&&
+                           f.DepartureDate == departureDate).ToList();
             if (allFlights.Count > 0)
             {
                 PrintConfig.PrintList(allFlights);
@@ -44,6 +44,7 @@ public static partial class Utilities
         }
         return null;
     }
+
     private static Booking? GetBooking(List<Booking>passengerBookings)
     {
         var num = Console.ReadLine();
@@ -51,6 +52,7 @@ public static partial class Utilities
         var booking = passengerBookings.FirstOrDefault(booking => booking.BookingId == res);
         return booking;
     }
+
     private static void ModifyDepartureCountry(Booking booking)
     {
         Console.WriteLine("Do you want to Modify Departure Country? y/n ");
@@ -61,6 +63,7 @@ public static partial class Utilities
             booking.Flight.DepartureCountry = departure;
         }
     }
+
     private static void ModifyDestinationCountry(Booking booking)
     {
         Console.WriteLine("Do you want to Modify Destination Country? y/n");
@@ -71,6 +74,7 @@ public static partial class Utilities
             booking.Flight.DestinationCountry = destination;
         }
     }
+
     private static void ModifyClassType(Booking booking)
     {
         Console.WriteLine("Do you want to Modify Class Type? y/n ");
@@ -81,36 +85,58 @@ public static partial class Utilities
             booking.Class = classType;
         }
     }
+
     private static void ModifyBooking(Passenger passenger)
     {
-        var exist = ViewPersonalBookings(passenger);
-        Validation.Errors.Clear();
-        if (exist)
+        if (!PassengerHasBookings(passenger))
         {
-            var passengerBookings = passenger.Bookings;
-            Console.WriteLine("Choose Booking Number you want to Modify");
-            var booking = GetBooking(passengerBookings);
-            if (booking != null)
-            {
-                ModifyDepartureCountry(booking);
-                ModifyDestinationCountry(booking);
-                ModifyClassType(booking);
-
-                if (Validation.Errors.Count > 0)
-                {
-                    PrintConfig.PrintList(Validation.Errors);
-                    Console.WriteLine("Please try again!");
-                }
-                else 
-                Console.WriteLine("Thanks! Booking Modified Successfully!");
-            }
-            else
-            {
-                Console.WriteLine("Can not update Booking, There is No Booking match!");
-            }
+            StartPassengerMenu(passenger);
+            return;
         }
-        StartPassengerMenu(passenger);  
+     
+        Validation.Errors.Clear();
+        var booking = ChooseBookingToModify(passenger);
+
+        if (booking == null)
+        {
+            Console.WriteLine("Cannot update booking: No matching booking found.");
+            StartPassengerMenu(passenger);
+            return;
+        }
+
+        ModifyBookingDetails(booking);
+
+        if (Validation.Errors.Any())
+        {
+            PrintConfig.PrintList(Validation.Errors);
+            Console.WriteLine("Please try again!");
+        }
+        else
+        {
+            Console.WriteLine("Thanks! Booking modified successfully!");
+        }
+
+        StartPassengerMenu(passenger);
     }
+
+    private static bool PassengerHasBookings(Passenger passenger)
+    {
+        return ViewPersonalBookings(passenger);
+    }
+
+    private static Booking ChooseBookingToModify(Passenger passenger)
+    {
+        Console.WriteLine("Choose Booking Number you want to modify:");
+        return GetBooking(passenger.Bookings);
+    }
+
+    private static void ModifyBookingDetails(Booking booking)
+    {
+        ModifyDepartureCountry(booking);
+        ModifyDestinationCountry(booking);
+        ModifyClassType(booking);
+    }
+
     private static void CancelBooking(Passenger passenger)
     {
         var exist = ViewPersonalBookings(passenger);
@@ -131,6 +157,7 @@ public static partial class Utilities
         } 
         StartPassengerMenu(passenger);
     }
+
     private static void BookAFlight(Passenger passenger)
     {
         var allFlights = SearchforAvailableFlights(passenger);
@@ -143,10 +170,11 @@ public static partial class Utilities
         BookingService.BookFlight(passenger, flight);
         Console.WriteLine("Booked Successfully!");
     }
+
     private static bool ViewPersonalBookings(Passenger passenger)
     {
         var passengerBookings = passenger.Bookings;
-        if (passengerBookings.Count  > 0 )
+        if (passengerBookings.Count > 0)
         {
             PrintConfig.PrintList(passengerBookings);  
             return true;

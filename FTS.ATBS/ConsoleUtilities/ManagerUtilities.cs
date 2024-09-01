@@ -1,4 +1,5 @@
 ﻿using FTS.ATBS.BookingManagement;
+using FTS.ATBS.Extenstions;
 using FTS.ATBS.Print;
 using FTS.ATBS.Repository;
 using FTS.ATBS.Users;
@@ -10,7 +11,7 @@ public static partial class  Utilities
         Validation.DynamicValidation();
         Console.WriteLine("Please Enter File Path");
         var path = Console.ReadLine();
-        if (path == null)
+        if (path is null)
         {
             Console.WriteLine("Path is not valid");
         }
@@ -20,6 +21,7 @@ public static partial class  Utilities
         }
         StartManagerMenu(manager);
     }
+
     private static void FilterBookings(Manager manager)
     {
         while (true)
@@ -67,13 +69,14 @@ public static partial class  Utilities
                 case "-1":
                     break;
                 default:
-                    Console.WriteLine("Un valid input!");
+                    Console.WriteLine("Unvalid input!");
                     continue;
             }
             StartManagerMenu(manager);
             break;
         }
     }
+
     private static void FilterClass(Manager manager)
     {
         var className = GetClass();
@@ -88,6 +91,7 @@ public static partial class  Utilities
             Console.WriteLine($"No Bookings for {className}  ");
         }   
     }
+
     private static void FilterPassenger(Manager manager)
     {
         var passengerId = GetPassenger();
@@ -102,12 +106,12 @@ public static partial class  Utilities
             Console.WriteLine($"No Bookings for {passengerId}  ");
         }
     }
+
     private static void FilterArrivalAirport(Manager manager)
     {
         var arrivalAirport = GetArrivalAirport();
         var allBookings = BookingService.GetAllBookings();
-        var res = allBookings.Where(book => string.Equals(book.Flight.ArrivalAirport,
-            arrivalAirport, StringComparison.CurrentCultureIgnoreCase)).ToList();
+        var res = allBookings.Where(book => book.Flight.ArrivalAirport.IsEqualIgnoreCase(arrivalAirport)).ToList();
         if (res.Count > 0)
         {
             PrintConfig.PrintList(res);
@@ -121,8 +125,7 @@ public static partial class  Utilities
     {
         var departureAirport = GetDepartureAirport();
         var allBookings = BookingService.GetAllBookings();
-        var res = allBookings.Where(book => string.Equals(book.Flight.DepartureAirport,
-            departureAirport, StringComparison.CurrentCultureIgnoreCase)).ToList();
+        var res = allBookings.Where(book => book.Flight.DepartureAirport.IsEqualIgnoreCase(departureAirport)).ToList();
         if (res.Count > 0)
         {
             PrintConfig.PrintList(res);
@@ -132,6 +135,7 @@ public static partial class  Utilities
             Console.WriteLine($"No Bookings with {departureAirport}  ");
         }
     }
+
     private static void FilterDepartureDate(Manager manager)
     {
         var departureDate = GetDepartureDate();
@@ -146,12 +150,12 @@ public static partial class  Utilities
             Console.WriteLine($"No Bookings with  {departureDate} ");
         }       
     }
+
     private static void FilterDestinationCountry(Manager manager)
     {
         var destinationCountry = GetDestinationCountry();
         var allBookings = BookingService.GetAllBookings();
-        var res = allBookings.Where(book => string.Equals(book.Flight.DestinationCountry,
-            destinationCountry, StringComparison.CurrentCultureIgnoreCase)).ToList();
+        var res = allBookings.Where(book => book.Flight.DestinationCountry.IsEqualIgnoreCase(destinationCountry)).ToList();
         if (res.Count > 0)
         {
             PrintConfig.PrintList(res);
@@ -161,13 +165,13 @@ public static partial class  Utilities
             Console.WriteLine($"No Bookings with   {destinationCountry} ");
         }
     }
+
     private static void FilterDepartureCountry(Manager manager)
     {
         var departureCountry = GetDepartureCountry();
         var allBookings = BookingService.GetAllBookings();
-        var res = allBookings.Where(book => string.Equals(book.Flight.DepartureCountry,
-            departureCountry, StringComparison.CurrentCultureIgnoreCase)).ToList();
-        if (res.Count >0)
+        var res = allBookings.Where(book => departureCountry.IsEqualIgnoreCase(book.Flight.DepartureCountry)).ToList();
+        if (res.Count > 0)
         {
             PrintConfig.PrintList(res);
         }
@@ -176,12 +180,13 @@ public static partial class  Utilities
             Console.WriteLine($"No Bookings with {departureCountry} ");
         }
     }
+
     private static void FilterPrice(Manager manager)
     {
         var price = GetPrice();
         var allBookings = BookingService.GetAllBookings();
         var res = allBookings.Where(book => book.Price == price).ToList();
-        if (res.Count>0)
+        if(res.Count > 0)
         {
             PrintConfig.PrintList(res);
         }
